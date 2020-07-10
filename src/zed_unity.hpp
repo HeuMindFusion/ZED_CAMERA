@@ -9,7 +9,11 @@
 namespace BYTECAT
 {
     cv::Mat slMat2cvMat(sl::Mat& input);
-   
+    cv::Mat splitImage(const cv::Mat& image);
+    void saveImage(sl::Mat& zed_image, std::string filename);
+    void savePointCloud(sl::Camera& zed, std::string filename);
+
+    //std::string  PointCloudFormatExt = ".ply";
 }
 
 
