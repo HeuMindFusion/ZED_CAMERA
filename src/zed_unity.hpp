@@ -6,6 +6,7 @@
 #include <sl/Camera.hpp>
 #include <opencv2/opencv.hpp>
 
+
 namespace BYTECAT
 {
     cv::Mat slMat2cvMat(sl::Mat& input);

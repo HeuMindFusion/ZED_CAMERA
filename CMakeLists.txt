@@ -2,6 +2,33 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 PROJECT(ZED_Camera)
 
 option(LINK_SHARED_ZED "Link with the ZED SDK shared executable" ON)
+set(CMAKE_CXX_STANDARD 14)
+
+set(WINDOWS TRUE CACHE INTERNAL "")
+set(PLATFORM_PREFIX "win64" CACHE INTERNAL "")
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+if (CMAKE_HOST_WIN32)
+    set(HOME_DIR $ENV{HOMEDRIVE}$ENV{HOMEPATH} CACHE INTERNAL "")
+else()
+    set(HOME_DIR $ENV{HOME} CACHE INTERNAL "")
+endif()
+if ("TEST$ENV{MAKE_DEPS_WORKING_DIR}" STREQUAL "TEST")
+    set(MAKE_DEPS_WORKING_DIR ${HOME_DIR}/makedeps)
+else()    
+    set(MAKE_DEPS_WORKING_DIR $ENV{MAKE_DEPS_WORKING_DIR})	
+endif()
+
+if (NOT ROOT_DIR_DEFINED)
+    add_definitions(-DROOT_DIR="${PROJECT_SOURCE_DIR}")
+    set(ROOT_DIR_DEFINED ON)
+endif()
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+include(${MAKE_DEPS_WORKING_DIR}/${PLATFORM_PREFIX}/deps.cmake)
+
+
 
 if (NOT LINK_SHARED_ZED AND MSVC)
     message(FATAL_ERROR "LINK_SHARED_ZED OFF : ZED SDK static libraries not available on Windows")
@@ -24,9 +51,19 @@ endif()
 
 SET(EXECUTABLE_OUTPUT_PATH ".")
 
+find_package(Boost REQUIRED)
+find_package(PCL REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(ZED 3 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(CUDA ${ZED_CUDA_VERSION} EXACT REQUIRED)
+
+if(PCL_FOUND)
+    message("-------------------------PCL_FOUND------")
+    include_directories(${PCL_INCLUDE_DIRS})
+    link_directories(${PCL_LIBRARY_DIRS})
+ endif()
+
 
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${ZED_INCLUDE_DIRS})
@@ -47,4 +84,4 @@ else()
     SET(ZED_LIBS ${ZED_STATIC_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_LIBRARY})
 endif()
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ZED_LIBS} ${OpenCV_LIBRARIES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ZED_LIBS} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES})

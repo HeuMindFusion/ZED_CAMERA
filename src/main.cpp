@@ -1,5 +1,8 @@
 #include "zed_unity.hpp"
 #include <stdio.h>
+#include "point_cloud_unity.hpp"
+
+
 int main(int argc, char **argv) {
     // Create a ZED Camera object
     sl::Camera zed;
@@ -11,7 +14,6 @@ int main(int argc, char **argv) {
     init_parameters.depth_mode = sl::DEPTH_MODE::ULTRA; // Use ULTRA depth mode
     init_parameters.coordinate_units = sl::UNIT::MILLIMETER; // Use millimeter units (for depth measurements)
 
-
     // Open the camera
     sl::ERROR_CODE zed_open_state = zed.open(init_parameters);
     if (zed_open_state != sl::ERROR_CODE::SUCCESS) {
@@ -21,9 +23,9 @@ int main(int argc, char **argv) {
     
     cv::String win_name = "left camera";
     cv::namedWindow(win_name,0);
+    cv::namedWindow("depth", 0);
     
     sl::Mat zed_image;
-    
     // Initialise camera setting
     auto camera_info = zed.getCameraInformation();
     const int image_width = camera_info.camera_configuration.resolution.width;
@@ -31,11 +33,23 @@ int main(int argc, char **argv) {
     sl::Resolution new_image_size(image_width, image_height);
     //sl::Mat depth_image_zed(image_width, image_height, sl::MAT_TYPE::U8_C4);
     
-    sl::Mat depth_map;
+    sl::Mat depth_map, depth_image_zed;
+    sl::Mat data_cloud;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr p_pcl_point_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+    std::shared_ptr<pcl::visualization::PCLVisualizer> viewer = BYTECAT::createRGBVisualizer(p_pcl_point_cloud);
+    p_pcl_point_cloud->points.resize(new_image_size.area());
     // Capture new images until 'q' is pressed
+    viewer->setCameraPosition(0, 0, 5, 0, 0, 1, 0, 1, 0);
+    viewer->setCameraClipDistances(0.1, 1000);
+    int count = 0;
     char key = ' ';
-    while (key != 'q') {
+    while (key != 'q') 
+    {
         // Check that grab() is successful
+        std::string leftName =  cv::format("../data/left%d.png", count);
+        std::string depthName = cv::format("../data/depth%d.png", count);
+        std::string cloudPointName = cv::format("../data/cloudPoint%d", count);
+       
         auto returned_state = zed.grab();
         if (returned_state == sl::ERROR_CODE::SUCCESS) 
         {
@@ -45,23 +59,33 @@ int main(int argc, char **argv) {
             cv::imshow(win_name, cvImage_left);
            
             float depth_value = 0;
-            depth_map.getValue(100, 100, &depth_value);
+            //depth_map.getValue(100, 100, &depth_value);
             
             cv::Mat depth(depth_map.getHeight(), depth_map.getWidth(), CV_32FC1, depth_map.getPtr<sl::uchar1>(sl::MEM::CPU));
-            BYTECAT::savePointCloud(zed, "test");
-            cv::imwrite("kk.png", depth);
-            cv::imwrite("kk.bmp", depth);
-            std::cout << "depth" << depth_value << std::endl;
-            std::cout << "depth----" << depth.at<float>(100, 100) << std::endl;
-            std::cout << "depth" << depth.channels() << std::endl;
-        }else 
+            zed.retrieveImage(depth_image_zed, sl::VIEW::DEPTH, sl::MEM::CPU, new_image_size);
+            cv::Mat depth_image_ocv = BYTECAT::slMat2cvMat(depth_image_zed);
+            cv::imshow("depth", depth_image_ocv);
+
+            zed.retrieveMeasure(data_cloud, sl::MEASURE::XYZRGBA, sl::MEM::CPU, new_image_size);
+            BYTECAT::zed2pointCloud(data_cloud, p_pcl_point_cloud);
+            viewer->updatePointCloud(p_pcl_point_cloud);
+            viewer->spinOnce(10);
+            if (key == 's')
+            {
+                std::cout << "save left iamge,depth iamge and point cloud file......" << std::endl;
+                BYTECAT::savePointCloud(zed, cloudPointName);
+                cv::imwrite(leftName, cvImage_left);
+                cv::imwrite(depthName, depth);
+                count = count + 1;
+            }
+
+        }
+        else 
         {
             printf("Error during capture : ", returned_state);
             break;
         }
-        
         key = cv::waitKey(10);
-           
     }
 
     // Exit

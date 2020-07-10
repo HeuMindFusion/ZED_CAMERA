@@ -58,4 +58,10 @@ namespace BYTECAT
             std::cout << "Failed to save point cloud... Please check that you have permissions to write at this location (" << filename << "). Re-run the sample with administrator rights under windows" << std::endl;
     }
 
+
+    void zed2pclCloud()
+    {
+
+    }
+
 }
