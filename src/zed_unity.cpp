@@ -64,4 +64,15 @@ namespace BYTECAT
 
     }
 
+    void saveDepth(const cv::Mat& depth, cv::Mat& depthOut)
+    {
+        for (int rows = 0; rows < depth.rows; rows++)
+        {
+            for (int cols = 0; cols < depth.cols; cols++)
+            {
+                depthOut.at<ushort>(rows, cols) = static_cast<float>(depth.at<ushort>(rows, cols));
+            }
+        }       
+    }
+
 }

@@ -72,10 +72,13 @@ int main(int argc, char **argv) {
             viewer->spinOnce(10);
             if (key == 's')
             {
-                std::cout << "save left iamge,depth iamge and point cloud file......" << std::endl;
+                std::cout << "save left image,depth image and point cloud file......" << std::endl;
                 BYTECAT::savePointCloud(zed, cloudPointName);
+                
+                cv::Mat depth_ushort(cv::Size(depth.cols, depth.rows), CV_16UC1);
+                BYTECAT::saveDepth(depth, depth_ushort);
                 cv::imwrite(leftName, cvImage_left);
-                cv::imwrite(depthName, depth);
+                cv::imwrite(depthName, depth_ushort);
                 count = count + 1;
             }
 
