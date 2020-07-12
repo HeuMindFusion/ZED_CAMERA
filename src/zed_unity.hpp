@@ -15,6 +15,8 @@ namespace BYTECAT
     void savePointCloud(sl::Camera& zed, std::string filename);
 
     //std::string  PointCloudFormatExt = ".ply";
+    //sl::Mat depth_image_zed(image_width, image_height, sl::MAT_TYPE::U8_C4);
+    //depth_map.getValue(100, 100, &depth_value);
 }
 
 

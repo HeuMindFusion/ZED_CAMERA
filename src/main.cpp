@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     const int image_width = camera_info.camera_configuration.resolution.width;
     const int image_height = camera_info.camera_configuration.resolution.height;
     sl::Resolution new_image_size(image_width, image_height);
-    //sl::Mat depth_image_zed(image_width, image_height, sl::MAT_TYPE::U8_C4);
+   
     
     sl::Mat depth_map, depth_image_zed;
     sl::Mat data_cloud;
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
             cv::imshow(win_name, cvImage_left);
            
             float depth_value = 0;
-            //depth_map.getValue(100, 100, &depth_value);
+           
             
             cv::Mat depth(depth_map.getHeight(), depth_map.getWidth(), CV_32FC1, depth_map.getPtr<sl::uchar1>(sl::MEM::CPU));
             zed.retrieveImage(depth_image_zed, sl::VIEW::DEPTH, sl::MEM::CPU, new_image_size);
