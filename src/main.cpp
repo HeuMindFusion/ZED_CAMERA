@@ -76,7 +76,9 @@ int main(int argc, char **argv) {
                 BYTECAT::savePointCloud(zed, cloudPointName);
                 
                 cv::Mat depth_ushort(cv::Size(depth.cols, depth.rows), CV_16UC1);
-                BYTECAT::saveDepth(depth, depth_ushort);
+                BYTECAT::convert2ushort(depth, depth_ushort);
+                std::cout << "ushort:"<<static_cast<int>(depth_ushort.at<ushort>(depth.rows / 2, depth.cols / 2)) << std::endl;
+                std::cout << static_cast<int>(depth.at<float>(depth.rows/2, depth.cols / 2)) << std::endl;
                 cv::imwrite(leftName, cvImage_left);
                 cv::imwrite(depthName, depth_ushort);
                 count = count + 1;
