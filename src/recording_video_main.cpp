@@ -67,11 +67,5 @@ int main()
         }
         key = cv::waitKey(1);
     }
-
-    
-
-
-
-
     return 0;
 }
