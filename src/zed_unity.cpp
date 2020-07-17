@@ -75,4 +75,39 @@ namespace BYTECAT
         }       
     }
 
+    void drawLine(cv::Mat& img)
+    {
+        const uchar interval = 20;
+        for (int row = interval; row < img.rows;)
+        {
+            
+           cv::line(img, cv::Point(0, row),
+               cv::Point(img.cols, row), cv::Scalar(0, 0, 255));
+           row += interval;
+        }
+
+    }
+
+    void image2video(const int& count, const int& frameWidth, const int& frameHeight)
+    {
+        double fps = 30;
+        bool iscolor = true;
+        cv::VideoWriter Writer;
+        Writer = cv::VideoWriter("../data/stereo01.mp4", cv::CAP_OPENCV_MJPEG, 
+            fps, cv::Size(frameWidth, frameHeight), iscolor);
+        for (int i = 0; i < count; i++)
+        {
+            std::string fileName = cv::format("../data/left%d.png", i);
+            cv::Mat img = cv::imread(fileName);
+            if (img.empty())
+            {
+                std::cout << "image empty!!" << std::endl;
+                continue;
+            }
+            //Writer.write(img);
+            Writer << img;
+        }
+        Writer.release();
+    }
+
 }

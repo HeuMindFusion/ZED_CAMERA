@@ -73,9 +73,22 @@ link_directories(${ZED_LIBRARY_DIR})
 link_directories(${OpenCV_LIBRARY_DIRS})
 link_directories(${CUDA_LIBRARY_DIRS})
 
-file(GLOB SRC_FILES src/*)
+file(GLOB IMG_SRC_FILES src/main.cpp 
+					src/point_cloud_unity.cpp 
+					src/zed_unity.cpp
+					src/zed_unity.hpp
+					src/point_cloud_unity.hpp
+					)
+					
+file(GLOB VIDEO_SRC_FILES src/recording_video_main.cpp 
+					src/point_cloud_unity.cpp 
+					src/zed_unity.cpp
+					src/zed_unity.hpp
+					src/point_cloud_unity.hpp
+					)
 
-ADD_EXECUTABLE(${PROJECT_NAME}  ${SRC_FILES})
+ADD_EXECUTABLE(${PROJECT_NAME}  ${IMG_SRC_FILES})
+ADD_EXECUTABLE(RecordingVideo  ${VIDEO_SRC_FILES})
 add_definitions(-std=c++14 -O3)
 
 if (LINK_SHARED_ZED)
@@ -85,3 +98,4 @@ else()
 endif()
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${ZED_LIBS} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES})
+TARGET_LINK_LIBRARIES(RecordingVideo ${ZED_LIBS} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES})
