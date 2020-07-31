@@ -53,6 +53,7 @@ int main()
             if (startFlag)
             {
                 std::string leftName = cv::format("../data/left%d.png", count);
+                std::cout<<leftName<<std::endl;
                 std::string rightName = cv::format("../data/right%d.png", count);
                 std::string depthName = cv::format("../data/depth%d.png", count);
                 cv::imwrite(leftName, cvImage_left);
